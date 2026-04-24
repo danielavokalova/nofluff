@@ -1,6 +1,6 @@
 :root {
-  --bg: #f5efe4;
-  --bg-accent: #efe6d2;
+  --bg: #e8ded0;
+  --bg-accent: #d9ccb8;
   --surface: rgba(255, 252, 247, 0.86);
   --surface-strong: #fffaf0;
   --ink: #1e1d1a;
@@ -39,8 +39,8 @@ select {
 }
 
 .page-shell {
-  width: calc(100vw - 32px);
-  margin: 16px auto 32px;
+  width: min(1480px, calc(100vw - 68px));
+  margin: 18px auto 32px;
 }
 
 .hero {
@@ -52,23 +52,6 @@ select {
   border-radius: var(--radius-xl);
   background: linear-gradient(140deg, rgba(255, 248, 236, 0.9), rgba(249, 244, 233, 0.74));
   box-shadow: var(--shadow);
-}
-
-.wordmark {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  width: 100%;
-  margin-bottom: 18px;
-  font-family: var(--font-display);
-  font-size: clamp(2rem, 8vw, 8rem);
-  line-height: 0.85;
-  text-transform: lowercase;
-  color: rgba(18, 26, 24, 0.9);
-}
-
-.wordmark span {
-  display: inline-flex;
 }
 
 .eyebrow,
@@ -275,17 +258,12 @@ select:focus {
   }
 
   .page-shell {
-    width: calc(100vw - 20px);
+    width: min(1480px, calc(100vw - 24px));
     margin-top: 10px;
   }
 
   .panel,
   .hero {
     padding: 18px;
-  }
-
-  .wordmark {
-    gap: 8px;
-    font-size: clamp(1.9rem, 11vw, 4rem);
   }
 }
