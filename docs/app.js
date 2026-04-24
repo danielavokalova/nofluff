@@ -12,6 +12,7 @@ const els = {
   sourceTitle: document.getElementById("sourceTitle"),
   sourceText: document.getElementById("sourceText"),
   extraInstructions: document.getElementById("extraInstructions"),
+  outputPurpose: document.getElementById("outputPurpose"),
   languageMode: document.getElementById("languageMode"),
   outputMode: document.getElementById("outputMode"),
   apiKey: document.getElementById("apiKey"),
@@ -156,7 +157,7 @@ async function extractTextFromFile(file) {
   };
 }
 
-function buildFallbackSummary({ url, title, extractedText, languageMode }) {
+function buildFallbackSummary({ url, title, extractedText, languageMode, outputPurpose }) {
   const sections = extractedText
     .split("\n")
     .map((line) => line.trim())
@@ -178,29 +179,43 @@ function buildFallbackSummary({ url, title, extractedText, languageMode }) {
     sourceUrl: url,
     extractedTitle: title,
     languageMode,
+    outputPurpose,
   };
 
   if (languageMode === "en" || languageMode === "both") {
     result.english = {
-      subject: title || "Product overview",
-      opening: `I am sharing a short overview of ${title || "this product"} based on the source page below.`,
+      subject: outputPurpose === "summary" ? title || "Short summary" : title || "Product overview",
+      opening:
+        outputPurpose === "summary"
+          ? `Short summary of ${title || "this product"} based on the source content below.`
+          : `I am sharing a short overview of ${title || "this product"} based on the source page below.`,
       keyPoints: keyLines || "- Main selling points were not extracted automatically.",
-      plans: planLines || "- Plan details were not extracted automatically.",
+      plans:
+        outputPurpose === "summary"
+          ? planLines || "- Version details were not extracted automatically."
+          : planLines || "- Plan details were not extracted automatically.",
       closing:
-        `If you would like to explore the product in more detail, you can find the full source page here: ${url}`,
-      sourceNote: `Read more: ${url}`,
+        outputPurpose === "summary"
+          ? `For more details, see the source here: ${url}`
+          : `If you would like to explore the product in more detail, you can find the full source page here: ${url}`,
+      sourceNote: outputPurpose === "summary" ? `Source: ${url}` : `Read more: ${url}`,
     };
   }
 
   if (languageMode === "cs" || languageMode === "both") {
     result.czech = {
-      subject: title || "Přehled produktu",
-      opening: `Posílám krátký přehled produktu ${title || ""} podle zdrojové stránky níže.`.trim(),
+      subject: outputPurpose === "summary" ? title || "Stručné shrnutí" : title || "Přehled produktu",
+      opening:
+        outputPurpose === "summary"
+          ? `Stručné shrnutí produktu ${title || ""} podle zdrojového obsahu níže.`.trim()
+          : `Posílám krátký přehled produktu ${title || ""} podle zdrojové stránky níže.`.trim(),
       keyPoints: keyLines || "- Hlavní přínosy se nepodařilo automaticky vytěžit.",
       plans: planLines || "- Detaily variant se nepodařilo automaticky vytěžit.",
       closing:
-        `Pokud si budeš chtít projít více detailů, kompletní zdrojová stránka je tady: ${url}`,
-      sourceNote: `Více informací: ${url}`,
+        outputPurpose === "summary"
+          ? `Pro více detailů je zdroj tady: ${url}`
+          : `Pokud si budeš chtít projít více detailů, kompletní zdrojová stránka je tady: ${url}`,
+      sourceNote: outputPurpose === "summary" ? `Zdroj: ${url}` : `Více informací: ${url}`,
     };
   }
 
@@ -250,16 +265,24 @@ function buildSchema(languageMode) {
   };
 }
 
-async function generateWithOpenAI({ apiKey, url, title, extractedText, languageMode, extraInstructions }) {
+async function generateWithOpenAI({ apiKey, url, title, extractedText, languageMode, outputPurpose, extraInstructions }) {
   const instructions = [
-    "You are writing short client-facing product emails.",
+    outputPurpose === "summary"
+      ? "You are writing short internal product summaries."
+      : "You are writing short client-facing product emails.",
     "Do not summarize the entire source page section by section.",
-    "Instead, identify only the most commercially relevant points and turn them into a concise email draft.",
+    outputPurpose === "summary"
+      ? "Identify only the most relevant points and turn them into a concise practical summary."
+      : "Instead, identify only the most commercially relevant points and turn them into a concise email draft.",
     "Keep the tone human, clear, short, practical, commercially useful, and mildly engaging.",
     "Avoid hype, repetition, feature dumps, and filler.",
     "Focus on what the product is, why it matters, the key differentiators, and a short explanation of plan/version differences when clearly available.",
-    "The result should feel like a concise email to a client, not an internal summary.",
-    "Always include the source URL in a natural read-more style closing so the client can explore more if interested.",
+    outputPurpose === "summary"
+      ? "The result should feel like a compact briefing note, not a client email."
+      : "The result should feel like a concise email to a client, not an internal summary.",
+    outputPurpose === "summary"
+      ? "Always include the source URL at the end so the reader can check more details."
+      : "Always include the source URL in a natural read-more style closing so the client can explore more if interested.",
     "Key points should be selective, not exhaustive.",
     "If version details are unclear, state that carefully instead of inventing them.",
     "Always preserve the source URL.",
@@ -270,6 +293,7 @@ async function generateWithOpenAI({ apiKey, url, title, extractedText, languageM
     `Source URL: ${url}`,
     `Detected title: ${title || "N/A"}`,
     `Requested language mode: ${languageMode}`,
+    `Requested output type: ${outputPurpose}`,
     extraInstructions ? `Additional instructions: ${extraInstructions}` : "",
     "Source text:",
     trimForModel(extractedText),
@@ -403,6 +427,7 @@ function toHtmlBlock(title, data, sourceUrl) {
 
 function buildOutputs(generated) {
   const outputMode = els.outputMode.value;
+  const outputPurpose = generated.outputPurpose || els.outputPurpose.value || "email";
   const sourceUrl = generated.sourceUrl || els.sourceUrl.value.trim();
   const english = generated.english || null;
   const czech = generated.czech || null;
@@ -414,8 +439,10 @@ function buildOutputs(generated) {
   }[outputMode];
 
   const pieces = {
-    english: english ? render("English Version", english, sourceUrl) : "",
-    czech: czech ? render("Czech Version", czech, sourceUrl) : "",
+    english: english
+      ? render(outputPurpose === "summary" ? "English Summary" : "English Email", english, sourceUrl)
+      : "",
+    czech: czech ? render(outputPurpose === "summary" ? "Czech Summary" : "Czech Email", czech, sourceUrl) : "",
   };
 
   pieces.combined = [pieces.english, pieces.czech].filter(Boolean).join(outputMode === "html" ? "<hr>" : "\n\n");
@@ -469,6 +496,9 @@ function getFilenameBase() {
 }
 
 function buildEmailSubject() {
+  if (els.outputPurpose.value === "summary") {
+    return state.generated?.extractedTitle || els.sourceTitle.value || "Short summary";
+  }
   return (
     state.generated?.english?.subject ||
     state.generated?.czech?.subject ||
@@ -483,6 +513,7 @@ function loadDemo() {
   els.sourceTitle.value = "GOL IBE";
   els.extraInstructions.value =
     "Write this like a short email to a client. Highlight only the most important commercial points, keep it brief, and always include a natural read-more link to the source page.";
+  els.outputPurpose.value = "email";
   els.sourceText.value = [
     "GOL IBE",
     "Online booking engine for travel agencies.",
@@ -540,21 +571,26 @@ async function generateSummary() {
 
   try {
     setButtonBusy(els.generateBtn, true, "Generating...");
-    setStatus("Generating short client-ready email...");
+    setStatus(els.outputPurpose.value === "summary" ? "Generating short summary..." : "Generating short client-ready email...");
 
     const apiKey = els.apiKey.value.trim();
+    const outputPurpose = els.outputPurpose.value;
     const languageMode = els.languageMode.value;
     const extraInstructions = els.extraInstructions.value.trim();
 
     state.generated = apiKey
-      ? await generateWithOpenAI({ apiKey, url, title, extractedText, languageMode, extraInstructions })
-      : buildFallbackSummary({ url, title, extractedText, languageMode });
+      ? await generateWithOpenAI({ apiKey, url, title, extractedText, languageMode, outputPurpose, extraInstructions })
+      : buildFallbackSummary({ url, title, extractedText, languageMode, outputPurpose });
 
     setActiveTab("combined");
     setStatus(
       apiKey
-        ? "Email-style output is ready. Copy it, download it, or open a mail draft."
-        : "Fallback email draft is ready. Add an OpenAI API key for a sharper client-facing version.",
+        ? outputPurpose === "summary"
+          ? "Short summary is ready."
+          : "Email-style output is ready. Copy it, download it, or open a mail draft."
+        : outputPurpose === "summary"
+          ? "Fallback short summary is ready. Add an OpenAI API key for a sharper version."
+          : "Fallback email draft is ready. Add an OpenAI API key for a sharper client-facing version.",
     );
   } catch (error) {
     setStatus(error.message, true);
@@ -642,6 +678,7 @@ els.downloadHtmlBtn.addEventListener("click", () => {
 });
 els.mailtoBtn.addEventListener("click", openMailDraft);
 els.outputMode.addEventListener("change", updateOutput);
+els.outputPurpose.addEventListener("change", updateOutput);
 els.tabs.forEach((tab) => tab.addEventListener("click", () => setActiveTab(tab.dataset.tab)));
 
 loadDemo();

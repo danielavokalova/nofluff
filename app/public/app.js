@@ -10,6 +10,7 @@ const els = {
   sourceTitle: document.getElementById("sourceTitle"),
   sourceText: document.getElementById("sourceText"),
   extraInstructions: document.getElementById("extraInstructions"),
+  outputPurpose: document.getElementById("outputPurpose"),
   languageMode: document.getElementById("languageMode"),
   outputMode: document.getElementById("outputMode"),
   apiKey: document.getElementById("apiKey"),
@@ -216,6 +217,7 @@ function toHtmlBlock(title, data, sourceUrl) {
 
 function buildOutputs(generated) {
   const outputMode = els.outputMode.value;
+  const outputPurpose = generated.outputPurpose || els.outputPurpose.value || "email";
   const sourceUrl = generated.sourceUrl || els.sourceUrl.value.trim();
   const english = generated.english || null;
   const czech = generated.czech || null;
@@ -228,8 +230,10 @@ function buildOutputs(generated) {
   const render = renderers[outputMode];
 
   const pieces = {
-    english: english ? render("English Version", english, sourceUrl) : "",
-    czech: czech ? render("Czech Version", czech, sourceUrl) : "",
+    english: english
+      ? render(outputPurpose === "summary" ? "English Summary" : "English Email", english, sourceUrl)
+      : "",
+    czech: czech ? render(outputPurpose === "summary" ? "Czech Summary" : "Czech Email", czech, sourceUrl) : "",
   };
 
   pieces.combined = [pieces.english, pieces.czech].filter(Boolean).join(outputMode === "html" ? "<hr>" : "\n\n");
@@ -285,6 +289,9 @@ function getFilenameBase() {
 }
 
 function buildEmailSubject() {
+  if (els.outputPurpose.value === "summary") {
+    return state.generated?.extractedTitle || els.sourceTitle.value || "Short summary";
+  }
   if (!state.generated) {
     return els.sourceTitle.value || "Product overview";
   }
@@ -302,6 +309,7 @@ function loadDemo() {
   els.sourceTitle.value = "GOL IBE";
   els.extraInstructions.value =
     "Write this like a short email to a client. Highlight only the most important commercial points, keep it brief, and always include a natural read-more link to the source page.";
+  els.outputPurpose.value = "email";
   els.sourceText.value = [
     "GOL IBE",
     "Online booking engine for travel agencies.",
@@ -364,13 +372,14 @@ async function generateSummary() {
 
   try {
     setButtonBusy(els.generateBtn, true, "Generating...");
-    setStatus("Generating short client-ready email...");
+    setStatus(els.outputPurpose.value === "summary" ? "Generating short summary..." : "Generating short client-ready email...");
     const payload = await requestJson("/api/generate", {
       method: "POST",
       body: JSON.stringify({
         url,
         title: els.sourceTitle.value.trim(),
         extractedText,
+        outputPurpose: els.outputPurpose.value,
         languageMode: els.languageMode.value,
         apiKey: els.apiKey.value.trim(),
         extraInstructions: els.extraInstructions.value.trim(),
@@ -380,8 +389,12 @@ async function generateSummary() {
     setActiveTab("combined");
     setStatus(
       payload.mode === "openai"
-        ? "Email-style output is ready. Copy it or export it for email."
-        : "Fallback email draft is ready. Add an OpenAI API key for a sharper client-facing version.",
+        ? els.outputPurpose.value === "summary"
+          ? "Short summary is ready."
+          : "Email-style output is ready. Copy it or export it for email."
+        : els.outputPurpose.value === "summary"
+          ? "Fallback short summary is ready. Add an OpenAI API key for a sharper version."
+          : "Fallback email draft is ready. Add an OpenAI API key for a sharper client-facing version.",
     );
   } catch (error) {
     setStatus(error.message, true);
@@ -459,6 +472,7 @@ els.downloadHtmlBtn.addEventListener("click", () => {
 });
 els.mailtoBtn.addEventListener("click", openMailDraft);
 els.outputMode.addEventListener("change", updateOutput);
+els.outputPurpose.addEventListener("change", updateOutput);
 els.tabs.forEach((tab) => {
   tab.addEventListener("click", () => setActiveTab(tab.dataset.tab));
 });

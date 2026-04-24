@@ -127,7 +127,7 @@ function trimForModel(text, maxChars = 18000) {
   return `${text.slice(0, maxChars)}\n\n[Content truncated for processing]`;
 }
 
-function buildFallbackSummary({ url, title, extractedText, languageMode }) {
+function buildFallbackSummary({ url, title, extractedText, languageMode, outputPurpose }) {
   const sections = extractedText
     .split("\n")
     .map((line) => line.trim())
@@ -149,29 +149,40 @@ function buildFallbackSummary({ url, title, extractedText, languageMode }) {
     sourceUrl: url,
     extractedTitle: title,
     languageMode,
+    outputPurpose,
   };
 
   if (languageMode === "en" || languageMode === "both") {
     result.english = {
-      subject: title || "Product overview",
-      opening: `I am sharing a short overview of ${title || "this product"} based on the source page below.`,
+      subject: outputPurpose === "summary" ? title || "Short summary" : title || "Product overview",
+      opening:
+        outputPurpose === "summary"
+          ? `Short summary of ${title || "this product"} based on the source content below.`
+          : `I am sharing a short overview of ${title || "this product"} based on the source page below.`,
       keyPoints: keyLines || "- Main selling points were not extracted automatically.",
       plans: planLines || "- Version details were not extracted automatically.",
       closing:
-        `If you would like to explore the product in more detail, you can find the full source page here: ${url}`,
-      sourceNote: `Read more: ${url}`,
+        outputPurpose === "summary"
+          ? `For more details, see the source here: ${url}`
+          : `If you would like to explore the product in more detail, you can find the full source page here: ${url}`,
+      sourceNote: outputPurpose === "summary" ? `Source: ${url}` : `Read more: ${url}`,
     };
   }
 
   if (languageMode === "cs" || languageMode === "both") {
     result.czech = {
-      subject: title || "Přehled produktu",
-      opening: `Posílám krátký přehled produktu ${title || ""} podle zdrojové stránky níže.`.trim(),
+      subject: outputPurpose === "summary" ? title || "Stručné shrnutí" : title || "Přehled produktu",
+      opening:
+        outputPurpose === "summary"
+          ? `Stručné shrnutí produktu ${title || ""} podle zdrojového obsahu níže.`.trim()
+          : `Posílám krátký přehled produktu ${title || ""} podle zdrojové stránky níže.`.trim(),
       keyPoints: keyLines || "- Hlavní přínosy se nepodařilo automaticky vytěžit.",
       plans: planLines || "- Detaily variant se nepodařilo automaticky vytěžit.",
       closing:
-        `Pokud si budeš chtít projít více detailů, kompletní zdrojová stránka je tady: ${url}`,
-      sourceNote: `Více informací: ${url}`,
+        outputPurpose === "summary"
+          ? `Pro více detailů je zdroj tady: ${url}`
+          : `Pokud si budeš chtít projít více detailů, kompletní zdrojová stránka je tady: ${url}`,
+      sourceNote: outputPurpose === "summary" ? `Zdroj: ${url}` : `Více informací: ${url}`,
     };
   }
 
@@ -267,18 +278,27 @@ async function generateWithOpenAI({
   title,
   extractedText,
   languageMode,
+  outputPurpose,
   extraInstructions,
 }) {
   const schema = buildOpenAiSchema(languageMode);
   const instructions = [
-    "You are writing short client-facing product emails.",
+    outputPurpose === "summary"
+      ? "You are writing short internal product summaries."
+      : "You are writing short client-facing product emails.",
     "Do not summarize the whole source page section by section.",
-    "Instead, identify only the most commercially relevant points and turn them into a concise email draft.",
+    outputPurpose === "summary"
+      ? "Identify only the most relevant points and turn them into a concise practical summary."
+      : "Instead, identify only the most commercially relevant points and turn them into a concise email draft.",
     "Keep the tone human, concise, clear, commercially useful, and mildly engaging.",
     "Avoid hype, fluff, feature dumps, and exaggerated marketing language.",
     "Focus on what the product is, why it matters, the key differentiators, and a short explanation of plan/version differences when clearly available.",
-    "The result should feel like a concise email to a client, not an internal summary.",
-    "Always include the source URL in a natural read-more style closing so the client can explore more if interested.",
+    outputPurpose === "summary"
+      ? "The result should feel like a compact briefing note, not a client email."
+      : "The result should feel like a concise email to a client, not an internal summary.",
+    outputPurpose === "summary"
+      ? "Always include the source URL at the end so the reader can check more details."
+      : "Always include the source URL in a natural read-more style closing so the client can explore more if interested.",
     "Key points should be selective, not exhaustive.",
     "If the page does not clearly define all plans, say that carefully instead of inventing details.",
     "Always preserve the source URL in the structured response.",
@@ -289,6 +309,7 @@ async function generateWithOpenAI({
     `Source URL: ${url}`,
     `Detected title: ${title || "N/A"}`,
     `Requested language mode: ${languageMode}`,
+    `Requested output type: ${outputPurpose}`,
     extraInstructions ? `Additional instructions: ${extraInstructions}` : "",
     "Source text:",
     extractedText,
@@ -338,6 +359,7 @@ async function generateWithOpenAI({
   return {
     mode: "openai",
     languageMode,
+    outputPurpose,
     ...parsed,
   };
 }
@@ -378,6 +400,7 @@ async function handleApi(req, res, pathname) {
     const url = body.url || "";
     const title = body.title || "";
     const extractedText = normalizeWhitespace(body.extractedText || "");
+    const outputPurpose = ["email", "summary"].includes(body.outputPurpose) ? body.outputPurpose : "email";
     const languageMode = ["en", "cs", "both"].includes(body.languageMode) ? body.languageMode : "both";
     const extraInstructions = normalizeWhitespace(body.extraInstructions || "");
 
@@ -394,6 +417,7 @@ async function handleApi(req, res, pathname) {
         title,
         extractedText: trimForModel(extractedText),
         languageMode,
+        outputPurpose,
         extraInstructions,
       });
       sendJson(res, 200, result);
@@ -404,6 +428,7 @@ async function handleApi(req, res, pathname) {
       url,
       title,
       extractedText,
+      outputPurpose,
       languageMode,
     });
     sendJson(res, 200, fallback);

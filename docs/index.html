@@ -101,6 +101,14 @@
 
           <div class="inline-grid">
             <label class="field">
+              <span>Output type</span>
+              <select id="outputPurpose">
+                <option value="email">Client email</option>
+                <option value="summary">Short summary</option>
+              </select>
+            </label>
+
+            <label class="field">
               <span>Language</span>
               <select id="languageMode">
                 <option value="both">English + Czech</option>
@@ -108,7 +116,9 @@
                 <option value="cs">Czech only</option>
               </select>
             </label>
+          </div>
 
+          <div class="inline-grid">
             <label class="field">
               <span>Output format</span>
               <select id="outputMode">
