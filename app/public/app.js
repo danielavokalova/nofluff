@@ -255,7 +255,7 @@ function getEmailBridgeText() {
 
   return {
     greeting: "Hi,",
-    bridge: "What seems most relevant from the source:",
+    bridge: "The main points that seem most relevant are:",
   };
 }
 

@@ -324,7 +324,7 @@ function buildFallbackSummary({ url, title, extractedText, languageMode, outputP
       opening:
         outputPurpose === "summary"
           ? `${title || "This product"} in short: ${description || "the source presents a product with a clear business use case and practical feature set."}`
-          : `I wanted to share a short overview of ${title || "this product"}. ${description || "It appears to offer a practical solution with a clear business focus."} From the source, it looks relevant where a client needs a concise explanation of what the product does and why it matters.`,
+          : `I wanted to share a short overview of ${title || "this product"}. ${description || "It appears to offer a practical solution with a clear business focus."}`,
       keyPoints: listFormatter(
         combinedFeatures,
         outputPurpose === "email"
@@ -333,16 +333,18 @@ function buildFallbackSummary({ url, title, extractedText, languageMode, outputP
       ),
       plans: pricing.length
         ? [
-            hasPackages ? "From the pricing section, these are the main package and fee points:" : "From the pricing section, these are the main points:",
+            hasPackages
+              ? "Based on the public source, the following versions or higher-tier options are clearly visible:"
+              : "Based on the public source, the pricing-related points that are clearly visible are:",
             listFormatter(pricing, ""),
           ].join("\n")
         : outputPurpose === "email"
-          ? "The source does not show a clearly structured package or pricing breakdown."
+          ? "The source does not show a clearly structured package or pricing breakdown, so I would treat versioning and pricing detail with caution."
           : "- The source does not show a clearly structured package or pricing breakdown.",
       closing:
         outputPurpose === "summary"
           ? `For more details, see the source here: ${url}`
-          : `If this looks relevant, I can share more detail, but the full source page is here: ${url}`,
+          : `If this looks relevant, I would be happy to share more detail. You can also find the full source page here: ${url}`,
       sourceNote: outputPurpose === "summary" ? `Source: ${url}` : `Read more: ${url}`,
     };
   }
@@ -504,8 +506,17 @@ async function generateWithOpenAI({
       ? "Keep bullets selective."
       : "Key points should continue naturally from the opening and focus on client value, not raw feature dumping.",
     outputPurpose === "summary"
+      ? "A simple structure is enough."
+      : "Use this email structure: greeting, one short intro explaining what the email is about, key product value and features, versions only if clearly confirmed by the source, a clear pricing recap, then a short closing that invites further interest and includes the source link.",
+    outputPurpose === "summary"
       ? "Markdown is acceptable."
       : "Do not use markdown markers or decorative symbols such as #, *, -, or bullet characters in the email body.",
+    outputPurpose === "summary"
+      ? "You may summarize uncertain pricing carefully."
+      : "Do not mention package names such as Standard, Basic, Pro, Enhanced, Enterprise, or similar unless they are clearly visible in the source.",
+    outputPurpose === "summary"
+      ? "Keep it factual."
+      : "The email should be interesting and client-friendly, but never pushy or overhyped.",
     "Key points should be selective, not exhaustive.",
     "Do not invent package names, tiers, or features that are not clearly present in the source text.",
     "If there are no named plans, do not imply that plans exist. If there is pricing for one product only, summarize it as pricing rather than packages.",
