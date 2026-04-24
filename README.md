@@ -1,6 +1,6 @@
 # Easifier
 
-Easifier is a small local web app for turning long product pages into clear, client-ready summaries that are easy to copy into email.
+Easifier is a small web app for turning long product pages into clear, client-ready summaries that are easy to copy into email.
 
 It is designed for workflows where you want to:
 
@@ -15,7 +15,8 @@ It is designed for workflows where you want to:
 
 Included today:
 
-- local web UI,
+- public GitHub Pages web UI,
+- local Node version for fuller fetch support,
 - source page fetch and text extraction,
 - EN / CZ / bilingual output mode,
 - copy-to-clipboard actions,
@@ -26,11 +27,21 @@ Included today:
 
 ## Project structure
 
-- [app](./app) - local web application
+- [docs](./docs) - public GitHub Pages site
+- [app](./app) - local Node-based version
 - [app/README.md](./app/README.md) - app-specific run instructions
 - [gol-ibe.md](./gol-ibe.md) - first manually prepared product summary
 
-## Run
+## Public web
+
+GitHub Pages can host Easifier as a public static website. GitHub documents Pages as a static hosting service for HTML, CSS, and JavaScript files, typically published at `https://<owner>.github.io/<repositoryname>` for project sites:
+
+- [What is GitHub Pages?](https://docs.github.com/en/pages/getting-started-with-github-pages/about-github-pages)
+- [Creating a GitHub Pages site](https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site)
+
+For this reason, the public Pages version keeps secrets out of the repository and runs OpenAI calls directly from the browser only when you paste your own API key.
+
+## Local run
 
 From the `easifier` folder:
 
@@ -59,14 +70,8 @@ Optional model override:
 $env:OPENAI_MODEL="gpt-5-mini"
 ```
 
-## GitHub readiness
+## Notes
 
-This folder is prepared to be used as its own repository.
-
-Recommended next step:
-
-1. Create a new GitHub repository named `easifier`
-2. Initialize git in this folder if needed
-3. Commit the files
-4. Add the GitHub remote
-5. Push
+- The public Pages version may not be able to fetch text from every external site because browsers enforce CORS.
+- When direct fetch is blocked, paste the source text manually and continue.
+- The local Node app in [app](./app) remains the better option when you need stronger source fetching.

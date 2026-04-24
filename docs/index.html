@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Easifier</title>
+    <meta
+      name="description"
+      content="Public GitHub Pages web app for turning long product pages into concise client-ready summaries in English and Czech."
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">Easifier</p>
+          <h1>Beautiful client summaries from messy product pages</h1>
+          <p class="hero-copy">
+            Built for quick product overviews you can actually send. Generate English, Czech, or bilingual
+            summaries, keep the source link visible, and copy or export the result cleanly for email.
+          </p>
+          <div class="hero-actions">
+            <a class="button primary" href="#workspace">Open workspace</a>
+            <a class="button secondary" href="https://github.com/danielavokalova/easifier">View GitHub repo</a>
+          </div>
+        </div>
+        <div class="hero-card">
+          <p class="card-label">Best use</p>
+          <ul>
+            <li>Long vendor landing pages</li>
+            <li>Feature-heavy pricing pages</li>
+            <li>Client-facing product recaps</li>
+            <li>Fast EN / CZ email prep</li>
+          </ul>
+        </div>
+      </header>
+
+      <section class="notice">
+        <strong>Important:</strong> this public GitHub Pages site is safe because it does not store your API key in
+        the repository. Some websites will block direct text extraction in the browser; when that happens, paste the
+        source text manually and continue.
+      </section>
+
+      <main id="workspace" class="layout">
+        <section class="panel">
+          <div class="panel-heading">
+            <h2>Source</h2>
+            <span id="healthBadge" class="badge">Browser mode</span>
+          </div>
+
+          <label class="field">
+            <span>Source URL</span>
+            <input id="sourceUrl" type="url" placeholder="https://www.example.com/product-page" />
+          </label>
+
+          <div class="button-row wrap">
+            <button id="fetchBtn" class="button primary">Try fetch URL</button>
+            <button id="loadDemoBtn" class="button secondary">Load demo</button>
+            <button id="clearSourceBtn" class="button ghost">Clear source</button>
+          </div>
+
+          <label class="field">
+            <span>Detected title</span>
+            <input id="sourceTitle" type="text" placeholder="Page title or product name" />
+          </label>
+
+          <label class="field">
+            <span>Extra instructions</span>
+            <textarea
+              id="extraInstructions"
+              rows="4"
+              placeholder="Optional: focus on pricing, version differences, client value, implementation scope, or target audience."
+            ></textarea>
+          </label>
+
+          <label class="field">
+            <span>Source text</span>
+            <textarea
+              id="sourceText"
+              rows="16"
+              placeholder="Paste source text here, or try URL fetch. Manual paste is the most reliable option on public web hosting."
+            ></textarea>
+          </label>
+        </section>
+
+        <section class="panel">
+          <div class="panel-heading">
+            <h2>Output</h2>
+            <span class="subtle">Public Pages version</span>
+          </div>
+
+          <div class="inline-grid">
+            <label class="field">
+              <span>Language</span>
+              <select id="languageMode">
+                <option value="both">English + Czech</option>
+                <option value="en">English only</option>
+                <option value="cs">Czech only</option>
+              </select>
+            </label>
+
+            <label class="field">
+              <span>Output format</span>
+              <select id="outputMode">
+                <option value="plain">Plain text</option>
+                <option value="markdown">Markdown</option>
+                <option value="html">HTML</option>
+              </select>
+            </label>
+          </div>
+
+          <label class="field">
+            <span>OpenAI API key</span>
+            <input
+              id="apiKey"
+              type="password"
+              placeholder="Optional. Used only in your browser session."
+              autocomplete="off"
+            />
+          </label>
+
+          <div class="button-row wrap">
+            <button id="generateBtn" class="button primary">Generate summary</button>
+            <button id="clearBtn" class="button ghost">Clear output</button>
+          </div>
+
+          <div class="result-tabs">
+            <button class="tab active" data-tab="combined">Combined</button>
+            <button class="tab" data-tab="english">English</button>
+            <button class="tab" data-tab="czech">Czech</button>
+          </div>
+
+          <label class="field">
+            <span>Generated output</span>
+            <textarea id="resultText" rows="18" placeholder="Your clean client-ready summary will appear here."></textarea>
+          </label>
+
+          <div class="button-row wrap">
+            <button id="copyBtn" class="button secondary">Copy output</button>
+            <button id="copySubjectBtn" class="button secondary">Copy subject</button>
+            <button id="downloadTxtBtn" class="button secondary">Download TXT</button>
+            <button id="downloadMdBtn" class="button secondary">Download MD</button>
+            <button id="downloadHtmlBtn" class="button secondary">Download HTML</button>
+            <button id="mailtoBtn" class="button ghost">Open mail draft</button>
+          </div>
+        </section>
+      </main>
+
+      <section class="panel status-panel">
+        <div class="panel-heading">
+          <h2>Status</h2>
+        </div>
+        <p id="statusMessage">Ready.</p>
+      </section>
+    </div>
+
+    <script src="./app.js"></script>
+  </body>
+  </html>
