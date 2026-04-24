@@ -176,17 +176,11 @@ function toMarkdownBlock(title, data, sourceUrl, outputPurpose) {
   }
   if (outputPurpose === "email") {
     const { greeting } = getEmailBridgeText();
-    return [
-      greeting,
-      "",
-      data.opening,
-      "",
-      toEmailMarkdownList(data.keyPoints),
-      "",
-      toEmailMarkdownList(data.plans),
-      "",
-      data.closing,
-    ].join("\n");
+    const transition = normalizeEmailLines(data.keyPoints || "");
+    const parts = [greeting, "", data.opening];
+    if (transition) parts.push("", transition);
+    parts.push("", data.plans || "", "", data.closing);
+    return parts.join("\n");
   }
   return [
     data.opening,
@@ -205,17 +199,11 @@ function toPlainBlock(title, data, sourceUrl, outputPurpose) {
   }
   if (outputPurpose === "email") {
     const { greeting } = getEmailBridgeText();
-    return [
-      greeting,
-      "",
-      data.opening,
-      "",
-      normalizeEmailLines(data.keyPoints),
-      "",
-      normalizeEmailLines(data.plans),
-      "",
-      data.closing,
-    ].join("\n");
+    const transition = normalizeEmailLines(data.keyPoints || "");
+    const parts = [greeting, "", data.opening];
+    if (transition) parts.push("", transition);
+    parts.push("", data.plans || "", "", data.closing);
+    return parts.join("\n");
   }
   return [
     data.opening,
@@ -252,7 +240,7 @@ function getEmailBridgeText() {
   }
 
   return {
-    greeting: "Hi,",
+    greeting: "Hello,",
     bridge: "The main points that seem most relevant are:",
   };
 }
@@ -286,12 +274,13 @@ function toHtmlBlock(title, data, sourceUrl, outputPurpose) {
   }
   if (outputPurpose === "email") {
     const { greeting } = getEmailBridgeText();
+    const transition = normalizeEmailLines(data.keyPoints || "");
     return [
       "<section>",
       `<p>${escapeHtml(greeting)}</p>`,
       textToHtmlParagraphs(data.opening),
-      toEmailHtmlList(data.keyPoints),
-      toEmailHtmlList(data.plans),
+      transition ? `<p>${escapeHtml(transition)}</p>` : "",
+      textToHtmlParagraphs(data.plans || ""),
       textToHtmlParagraphs(data.closing),
       "</section>",
     ].join("");
@@ -300,7 +289,7 @@ function toHtmlBlock(title, data, sourceUrl, outputPurpose) {
     "<section>",
     textToHtmlParagraphs(data.opening),
     toEmailHtmlList(data.keyPoints),
-    toEmailHtmlList(data.plans),
+    textToHtmlParagraphs(data.plans || ""),
     textToHtmlParagraphs(data.closing),
     "</section>",
   ].join("");

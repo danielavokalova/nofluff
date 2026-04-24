@@ -307,7 +307,16 @@ function buildFallbackSummary({ url, title, extractedText, languageMode, outputP
     title,
     extractedText,
   });
-  const combinedFeatures = [...audience, ...features, ...facts].slice(0, 5);
+  const descriptionLower = description.toLowerCase();
+  const seenFeatures = new Set([descriptionLower]);
+  const combinedFeatures = [...audience, ...features, ...facts]
+    .filter((line) => {
+      const lower = line.toLowerCase();
+      if (seenFeatures.has(lower)) return false;
+      seenFeatures.add(lower);
+      return true;
+    })
+    .slice(0, 5);
   const listFormatter = outputPurpose === "email" ? formatPlainLineBlock : formatBulletBlock;
 
   const result = {
@@ -332,15 +341,10 @@ function buildFallbackSummary({ url, title, extractedText, languageMode, outputP
           : "- The source did not expose enough clear feature detail for a stronger automatic summary.",
       ),
       plans: pricing.length
-        ? [
-            hasPackages
-              ? "Based on the public source, the following versions or higher-tier options are clearly visible:"
-              : "Based on the public source, the pricing-related points that are clearly visible are:",
-            listFormatter(pricing, ""),
-          ].join("\n")
+        ? listFormatter(pricing, "")
         : outputPurpose === "email"
-          ? "The source does not show a clearly structured package or pricing breakdown, so I would treat versioning and pricing detail with caution."
-          : "- The source does not show a clearly structured package or pricing breakdown.",
+          ? "Pricing details are available on request."
+          : "- Pricing details are available on request.",
       closing:
         outputPurpose === "summary"
           ? `For more details, see the source here: ${url}`
@@ -493,22 +497,22 @@ async function generateWithOpenAI({
       `opening: ${
         outputPurpose === "summary"
           ? "1 to 2 sentences. State what the product is and who it is for."
-          : "2 to 3 connected sentences. Introduce the product and give one reason why it could be relevant to the client. Vary the opener — do not always start with 'I wanted to share'."
+          : "Write 2 full paragraphs separated by a blank line. First paragraph (2-3 sentences): introduce the product by name, the company if mentioned, and explain what it does and for whom. Second paragraph (2-3 sentences): describe the key value the client gains — what content sources, main capability areas, and business problems it addresses."
       }`,
       `keyPoints: ${
         outputPurpose === "summary"
           ? "Short list. One fact or benefit per line. Use - as bullet marker. Maximum 5 items."
-          : "Each point on its own line. No bullet markers (no -, *, •, or any other symbol). One clear fact or benefit per line, written as a complete thought. Maximum 5 lines."
+          : "Write a single short transition sentence leading naturally into the version or pricing section, for example: 'Based on publicly available information, two versions are offered:'. If the source has no clearly named versions or pricing tiers, leave this field empty."
       }`,
       `plans: ${
         outputPurpose === "summary"
           ? "If pricing or packages are visible, list each on its own line. If not, write one sentence saying so."
-          : "If pricing or packages are clearly stated in the source, list each on its own line as: Name: price · key detail. If no clear pricing exists, write: 'Pricing is available on request.' No bullet markers."
+          : "For each clearly named version or tier: write the version name on its own line, then 'Best for: [1-2 sentences about who benefits and why]', then a 2-3 sentence summary of what it includes or adds. Separate each version block with a blank line. After all versions, add a blank line, then write 'Pricing overview:' on its own line, then one compact line per fee in the format: 'Fee name: Version1 value / Version2 value'. Include monthly fee, per-booking fees, and deposit. If no named tiers exist, describe the pricing clearly. If no pricing at all, write: 'Pricing is available on request.'"
       }`,
       `closing: ${
         outputPurpose === "summary"
           ? "One sentence pointing to the source URL."
-          : "One natural sentence inviting further interest. Include the source URL naturally, for example: 'The full product page is here: [url]'."
+          : "Write 2 sentences. First: a one-sentence overall assessment of what makes this solution interesting or valuable. Second: invite the client to ask for a more detailed breakdown and include the source URL naturally, for example: 'More information is also available here: [url]'."
       }`,
       "sourceNote: The source URL only.",
     ].join("\n"),
@@ -516,7 +520,7 @@ async function generateWithOpenAI({
     [
       "STRICT RULES",
       outputPurpose === "email"
-        ? "No markdown in the output: no #, *, -, •, ~ or any formatting characters."
+        ? "No markdown in the output: no #, *, -, •, ~ or any other formatting characters. Use blank lines to separate paragraphs and sections."
         : "Markdown bullets are acceptable in keyPoints and plans.",
       "No invented features, package names, or prices — only what is clearly stated in the source.",
       "Only mention package names (Standard, Basic, Enhanced, Enterprise, etc.) if they appear in the source.",
