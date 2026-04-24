@@ -132,7 +132,12 @@ h1 {
   margin-top: 18px;
   padding: 16px 18px;
   line-height: 1.6;
-  background: rgba(216, 195, 165, 0.62);
+  background: linear-gradient(135deg, rgba(233, 128, 116, 0.34), rgba(232, 90, 79, 0.18));
+  border: 1px solid rgba(232, 90, 79, 0.28);
+}
+
+.notice strong {
+  color: #e85a4f;
 }
 
 .layout {
