@@ -238,6 +238,13 @@ function formatBulletBlock(lines, emptyMessage) {
   return lines.map((line) => `- ${sentenceCase(line)}`).join("\n");
 }
 
+function formatPlainLineBlock(lines, emptyMessage) {
+  if (!lines.length) {
+    return emptyMessage;
+  }
+  return lines.map((line) => sentenceCase(line)).join("\n");
+}
+
 function buildHeuristicContent({ title, extractedText }) {
   const lines = cleanSourceLines(extractedText);
   const description = pickFirstMeaningfulDescription(lines, title);
@@ -301,6 +308,7 @@ function buildFallbackSummary({ url, title, extractedText, languageMode, outputP
     extractedText,
   });
   const combinedFeatures = [...audience, ...features, ...facts].slice(0, 5);
+  const listFormatter = outputPurpose === "email" ? formatPlainLineBlock : formatBulletBlock;
 
   const result = {
     mode: "fallback",
@@ -317,16 +325,20 @@ function buildFallbackSummary({ url, title, extractedText, languageMode, outputP
         outputPurpose === "summary"
           ? `${title || "This product"} in short: ${description || "the source presents a product with a clear business use case and practical feature set."}`
           : `I wanted to share a short overview of ${title || "this product"}. ${description || "It appears to offer a practical solution with a clear business focus."} From the source, it looks relevant where a client needs a concise explanation of what the product does and why it matters.`,
-      keyPoints: formatBulletBlock(
+      keyPoints: listFormatter(
         combinedFeatures,
-        "- The source did not expose enough clear feature detail for a stronger automatic summary.",
+        outputPurpose === "email"
+          ? "The source did not expose enough clear feature detail for a stronger automatic summary."
+          : "- The source did not expose enough clear feature detail for a stronger automatic summary.",
       ),
       plans: pricing.length
         ? [
             hasPackages ? "From the pricing section, these are the main package and fee points:" : "From the pricing section, these are the main points:",
-            formatBulletBlock(pricing, ""),
+            listFormatter(pricing, ""),
           ].join("\n")
-        : "- The source does not show a clearly structured package or pricing breakdown.",
+        : outputPurpose === "email"
+          ? "The source does not show a clearly structured package or pricing breakdown."
+          : "- The source does not show a clearly structured package or pricing breakdown.",
       closing:
         outputPurpose === "summary"
           ? `For more details, see the source here: ${url}`
@@ -342,16 +354,20 @@ function buildFallbackSummary({ url, title, extractedText, languageMode, outputP
         outputPurpose === "summary"
           ? `${title || "Tento produkt"} ve zkratce: ${description || "zdroj ukazuje reseni s jasnym byznysovym pouzitim a praktickymi funkcemi."}`
           : `Posilam kratky prehled produktu ${title || ""}. ${description || "Jde o reseni s jasnym byznysovym zamerenim a praktickym prinosem."} Podle zdroje jde o produkt, ktery se da klientovi vysvetlit rychle a srozumitelne.`.trim(),
-      keyPoints: formatBulletBlock(
+      keyPoints: listFormatter(
         combinedFeatures,
-        "- Ve zdroji nebylo dost jednoznacnych informaci pro lepsi automaticke shrnuti funkci.",
+        outputPurpose === "email"
+          ? "Ve zdroji nebylo dost jednoznacnych informaci pro lepsi automaticke shrnuti funkci."
+          : "- Ve zdroji nebylo dost jednoznacnych informaci pro lepsi automaticke shrnuti funkci.",
       ),
       plans: pricing.length
         ? [
             hasPackages ? "Z cenove casti jsou nejdulezitejsi tyto body:" : "Z cenove casti jsou nejdulezitejsi tyto body:",
-            formatBulletBlock(pricing, ""),
+            listFormatter(pricing, ""),
           ].join("\n")
-        : "- Zdroj neukazuje jasne rozdeleni balicku ani ceniku.",
+        : outputPurpose === "email"
+          ? "Zdroj neukazuje jasne rozdeleni balicku ani ceniku."
+          : "- Zdroj neukazuje jasne rozdeleni balicku ani ceniku.",
       closing:
         outputPurpose === "summary"
           ? `Pro vice detailu je zdroj tady: ${url}`
@@ -487,6 +503,9 @@ async function generateWithOpenAI({
     outputPurpose === "summary"
       ? "Keep bullets selective."
       : "Key points should continue naturally from the opening and focus on client value, not raw feature dumping.",
+    outputPurpose === "summary"
+      ? "Markdown is acceptable."
+      : "Do not use markdown markers or decorative symbols such as #, *, -, or bullet characters in the email body.",
     "Key points should be selective, not exhaustive.",
     "Do not invent package names, tiers, or features that are not clearly present in the source text.",
     "If there are no named plans, do not imply that plans exist. If there is pricing for one product only, summarize it as pricing rather than packages.",

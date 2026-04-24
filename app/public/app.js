@@ -182,9 +182,9 @@ function toMarkdownBlock(title, data, sourceUrl, outputPurpose) {
       data.opening,
       "",
       bridge,
-      data.keyPoints,
+      sanitizeEmailLines(data.keyPoints),
       "",
-      data.plans,
+      sanitizeEmailLines(data.plans),
       "",
       data.closing,
     ].join("\n");
@@ -212,9 +212,9 @@ function toPlainBlock(title, data, sourceUrl, outputPurpose) {
       `${data.opening}`,
       "",
       bridge,
-      `${data.keyPoints}`,
+      sanitizeEmailLines(`${data.keyPoints}`),
       "",
-      `${data.plans}`,
+      sanitizeEmailLines(`${data.plans}`),
       "",
       `${data.closing}`,
     ].join("\n");
@@ -259,6 +259,15 @@ function getEmailBridgeText() {
   };
 }
 
+function sanitizeEmailLines(input) {
+  return (input || "")
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => line.replace(/^[-*#•]+\s*/, ""))
+    .join("\n");
+}
+
 function toHtmlBlock(title, data, sourceUrl, outputPurpose) {
   if (!data) {
     return "";
@@ -270,8 +279,8 @@ function toHtmlBlock(title, data, sourceUrl, outputPurpose) {
       `<p>${escapeHtml(greeting)}</p>`,
       textToHtmlParagraphs(data.opening),
       `<p>${escapeHtml(bridge)}</p>`,
-      textToHtmlParagraphs(data.keyPoints),
-      textToHtmlParagraphs(data.plans),
+      textToHtmlParagraphs(sanitizeEmailLines(data.keyPoints)),
+      textToHtmlParagraphs(sanitizeEmailLines(data.plans)),
       textToHtmlParagraphs(data.closing),
       `</section>`,
     ].join("");
