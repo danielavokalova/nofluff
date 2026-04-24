@@ -1,11 +1,11 @@
 :root {
   --bg: #eae7dc;
   --bg-accent: #d8c3a5;
-  --surface: rgba(255, 253, 249, 0.98);
+  --surface: #f7f3ec;
   --surface-strong: #fffdf9;
-  --ink: #2b2925;
-  --muted: #6d6760;
-  --line: rgba(142, 141, 138, 0.28);
+  --ink: #3b3936;
+  --muted: #8e8d8a;
+  --line: rgba(142, 141, 138, 0.34);
   --primary: #e85a4f;
   --primary-strong: #e98074;
   --secondary: #e85a4f;
@@ -28,8 +28,8 @@ body {
   color: var(--ink);
   background:
     radial-gradient(circle at top left, rgba(255, 255, 255, 0.35), transparent 24%),
-    radial-gradient(circle at top right, rgba(233, 128, 116, 0.2), transparent 24%),
-    linear-gradient(135deg, #eae7dc 0%, #d8c3a5 48%, #d8c3a5 100%);
+    radial-gradient(circle at top right, rgba(233, 128, 116, 0.22), transparent 24%),
+    linear-gradient(135deg, #eae7dc 0%, #d8c3a5 52%, #d8c3a5 100%);
 }
 
 button,
@@ -52,8 +52,8 @@ select {
   border: 1px solid var(--line);
   border-radius: var(--radius-xl);
   background:
-    radial-gradient(circle at top right, rgba(232, 90, 79, 0.18), transparent 28%),
-    linear-gradient(140deg, rgba(255, 251, 246, 0.98), rgba(244, 235, 223, 0.96));
+    radial-gradient(circle at top right, rgba(233, 128, 116, 0.18), transparent 28%),
+    linear-gradient(140deg, rgba(247, 243, 236, 0.98), rgba(234, 231, 220, 0.98));
   box-shadow: var(--shadow);
 }
 
@@ -99,7 +99,7 @@ h1 {
   padding: 22px;
   align-self: end;
   background:
-    linear-gradient(180deg, rgba(233, 128, 116, 0.18), rgba(255, 250, 243, 0.98));
+    linear-gradient(180deg, rgba(216, 195, 165, 0.7), rgba(247, 243, 236, 0.98));
 }
 
 .hero-card ol {
@@ -119,7 +119,7 @@ h1 {
 .panel {
   padding: 20px;
   background:
-    linear-gradient(180deg, rgba(255, 253, 249, 0.99), rgba(255, 250, 244, 0.97));
+    linear-gradient(180deg, rgba(247, 243, 236, 0.99), rgba(234, 231, 220, 0.94));
 }
 
 .panel-heading {
@@ -139,8 +139,8 @@ h1 {
 .badge {
   padding: 8px 12px;
   border-radius: 999px;
-  background: rgba(233, 128, 116, 0.16);
-  border: 1px solid rgba(232, 90, 79, 0.18);
+  background: rgba(233, 128, 116, 0.2);
+  border: 1px solid rgba(232, 90, 79, 0.24);
 }
 
 .field {
@@ -162,7 +162,7 @@ select {
   padding: 12px 14px;
   border-radius: var(--radius-md);
   border: 1px solid rgba(142, 141, 138, 0.24);
-  background: rgba(255, 252, 247, 0.95);
+  background: #fbf8f2;
   color: var(--ink);
   transition: border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
 }
@@ -216,14 +216,14 @@ select:focus {
 
 .button.secondary {
   color: var(--ink);
-  background: rgba(216, 195, 165, 0.46);
-  border: 1px solid rgba(142, 141, 138, 0.24);
+  background: #d8c3a5;
+  border: 1px solid rgba(142, 141, 138, 0.28);
 }
 
 .button.ghost {
   color: var(--muted);
   background: transparent;
-  border: 1px dashed rgba(142, 141, 138, 0.28);
+  border: 1px dashed rgba(142, 141, 138, 0.4);
 }
 
 .result-tabs {
