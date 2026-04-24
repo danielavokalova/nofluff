@@ -40,7 +40,7 @@ select {
 }
 
 .page-shell {
-  width: min(1520px, calc(100vw - 56px));
+  width: min(1640px, calc(100vw - 40px));
   margin: 16px auto 28px;
 }
 
@@ -265,7 +265,7 @@ select:focus {
   }
 
   .page-shell {
-    width: min(1520px, calc(100vw - 20px));
+    width: min(1640px, calc(100vw - 20px));
     margin-top: 10px;
   }
 
