@@ -99,6 +99,29 @@ function extractPlainTextFromHtml(html) {
   return extractHtmlParts(html).extractedText;
 }
 
+function inferTitleFromReaderText(text, fallbackUrl) {
+  const lines = text
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  const heading = lines.find((line) => line.startsWith("# "));
+  if (heading) {
+    return heading.replace(/^#\s+/, "").trim();
+  }
+
+  const titleLine = lines.find((line) => /^title:\s*/i.test(line));
+  if (titleLine) {
+    return titleLine.replace(/^title:\s*/i, "").trim();
+  }
+
+  try {
+    return new URL(fallbackUrl).hostname;
+  } catch {
+    return fallbackUrl;
+  }
+}
+
 async function extractTextFromPdf(file) {
   if (!window.pdfjsLib) {
     throw new Error("PDF support is not available right now.");
@@ -495,19 +518,21 @@ async function fetchSource() {
 
   try {
     setButtonBusy(els.fetchBtn, true, "Trying...");
-    setStatus("Trying to fetch source text directly in the browser...");
-    const response = await fetch(url);
+    setStatus("Fetching the source page through the reader service...");
+    const normalizedUrl = /^https?:\/\//i.test(url) ? url : `https://${url}`;
+    const readerUrl = `https://r.jina.ai/http://${normalizedUrl.replace(/^https?:\/\//i, "")}`;
+    const response = await fetch(readerUrl);
     if (!response.ok) {
       throw new Error(`Fetch failed with status ${response.status}.`);
     }
-    const html = await response.text();
-    const extracted = extractHtmlParts(html);
-    els.sourceTitle.value = extracted.title || els.sourceTitle.value;
-    els.sourceText.value = extracted.extractedText || "";
-    setStatus("Source fetched successfully. If the text looks incomplete, paste the source manually.");
+    const readerText = normalizeWhitespace(await response.text());
+    els.sourceTitle.value = els.sourceTitle.value || inferTitleFromReaderText(readerText, normalizedUrl);
+    els.sourceText.value = readerText || "";
+    els.sourceUrl.value = normalizedUrl;
+    setStatus("Source fetched successfully. If the result looks incomplete, paste the source text manually.");
   } catch (error) {
     setStatus(
-      `Direct fetch was blocked or failed. Paste the source text manually and continue. Details: ${error.message}`,
+      `Reader fetch failed. Paste the source text manually and continue. Details: ${error.message}`,
       true,
     );
   } finally {
