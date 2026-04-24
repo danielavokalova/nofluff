@@ -47,7 +47,7 @@ a {
 }
 
 .page-shell {
-  width: min(1480px, calc(100vw - 64px));
+  width: min(1320px, calc(100vw - 96px));
   margin: 18px auto 32px;
 }
 
@@ -134,13 +134,13 @@ h1 {
 
 .layout {
   display: grid;
-  grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr);
-  gap: 20px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.96fr);
+  gap: 18px;
   margin-top: 18px;
 }
 
 .panel {
-  padding: 22px;
+  padding: 18px;
 }
 
 .panel-heading {
@@ -168,7 +168,7 @@ h1 {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .field span {
@@ -182,7 +182,7 @@ select {
   width: 100%;
   border: 1px solid rgba(54, 44, 28, 0.15);
   border-radius: var(--radius-md);
-  padding: 14px 16px;
+  padding: 12px 14px;
   background: rgba(255, 255, 255, 0.9);
   color: var(--ink);
   transition: border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
@@ -210,7 +210,7 @@ select:focus {
 .button-row {
   display: flex;
   gap: 10px;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .button-row.wrap {
@@ -290,7 +290,7 @@ select:focus {
   }
 
   .page-shell {
-    width: min(1480px, calc(100vw - 24px));
+    width: min(1320px, calc(100vw - 24px));
     margin-top: 9px;
   }
 
