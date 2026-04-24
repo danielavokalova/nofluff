@@ -1,0 +1,16 @@
+{
+  "name": "easifier",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Local web app for turning long product pages into concise client-ready summaries in English and Czech.",
+  "main": "app/server.js",
+  "scripts": {
+    "start": "node app/server.js",
+    "dev": "node app/server.js",
+    "check:server": "node --check app/server.js",
+    "check:client": "node --check app/public/app.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Easifier</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">Easifier</p>
+          <h1>Turn long product pages into clean client-ready summaries</h1>
+          <p class="hero-copy">
+            Fetch a source page, generate a concise product brief in English, Czech, or both, and copy or
+            export it for email in plain text, Markdown, or HTML.
+          </p>
+        </div>
+        <div class="hero-card">
+          <p class="card-label">Workflow</p>
+          <ol>
+            <li>Paste a source URL</li>
+            <li>Fetch the page text</li>
+            <li>Generate EN / CZ summary</li>
+            <li>Copy or export for email</li>
+          </ol>
+        </div>
+      </header>
+
+      <main class="layout">
+        <section class="panel">
+          <div class="panel-heading">
+            <h2>Source</h2>
+            <span id="healthBadge" class="badge">Checking AI status...</span>
+          </div>
+
+          <label class="field">
+            <span>Source URL</span>
+            <input id="sourceUrl" type="url" placeholder="https://www.example.com/product-page" />
+          </label>
+
+          <div class="button-row">
+            <button id="fetchBtn" class="button primary">Fetch source</button>
+            <button id="loadDemoBtn" class="button secondary">Load GOL IBE demo</button>
+          </div>
+
+          <label class="field">
+            <span>Detected title</span>
+            <input id="sourceTitle" type="text" placeholder="Page title" />
+          </label>
+
+          <label class="field">
+            <span>Extra instructions</span>
+            <textarea
+              id="extraInstructions"
+              rows="4"
+              placeholder="Optional: focus on pricing, target audience, plan comparison, or a specific client angle."
+            ></textarea>
+          </label>
+
+          <label class="field">
+            <span>Source text</span>
+            <textarea
+              id="sourceText"
+              rows="14"
+              placeholder="Fetched source text will appear here. You can also paste your own source text manually."
+            ></textarea>
+          </label>
+        </section>
+
+        <section class="panel">
+          <div class="panel-heading">
+            <h2>Generation</h2>
+            <span class="subtle">AI optional, formatting always available</span>
+          </div>
+
+          <div class="inline-grid">
+            <label class="field">
+              <span>Language</span>
+              <select id="languageMode">
+                <option value="both">English + Czech</option>
+                <option value="en">English only</option>
+                <option value="cs">Czech only</option>
+              </select>
+            </label>
+
+            <label class="field">
+              <span>Output view</span>
+              <select id="outputMode">
+                <option value="plain">Plain text</option>
+                <option value="markdown">Markdown</option>
+                <option value="html">HTML</option>
+              </select>
+            </label>
+          </div>
+
+          <label class="field">
+            <span>OpenAI API key</span>
+            <input
+              id="apiKey"
+              type="password"
+              placeholder="Optional. Needed for polished bilingual generation."
+              autocomplete="off"
+            />
+          </label>
+
+          <div class="button-row">
+            <button id="generateBtn" class="button primary">Generate summary</button>
+            <button id="clearBtn" class="button ghost">Clear output</button>
+          </div>
+
+          <div class="result-tabs">
+            <button class="tab active" data-tab="combined">Combined</button>
+            <button class="tab" data-tab="english">English</button>
+            <button class="tab" data-tab="czech">Czech</button>
+          </div>
+
+          <label class="field">
+            <span>Generated output</span>
+            <textarea id="resultText" rows="18" placeholder="Your summary will appear here."></textarea>
+          </label>
+
+          <div class="button-row wrap">
+            <button id="copyBtn" class="button secondary">Copy output</button>
+            <button id="copySubjectBtn" class="button secondary">Copy email subject</button>
+            <button id="downloadTxtBtn" class="button secondary">Download TXT</button>
+            <button id="downloadMdBtn" class="button secondary">Download MD</button>
+            <button id="downloadHtmlBtn" class="button secondary">Download HTML</button>
+            <button id="mailtoBtn" class="button ghost">Open mail draft</button>
+          </div>
+        </section>
+      </main>
+
+      <section class="panel status-panel">
+        <div class="panel-heading">
+          <h2>Status</h2>
+        </div>
+        <p id="statusMessage">Ready.</p>
+      </section>
+    </div>
+
+    <script src="/app.js"></script>
+  </body>
+  </html>
