@@ -9,26 +9,60 @@
   <body>
     <div class="page-shell">
       <header class="hero">
-        <div>
-          <p class="eyebrow">nofluff</p>
-          <h1>No Fluff. Just the Meat.</h1>
-          <p class="hero-copy">
-            Pull from a URL, pasted text, or file and turn it into a client email or a short summary in
-            English or Czech.
-          </p>
+        <div class="hero-topline">
+          <span class="brand-mark">nofluff</span>
+          <nav class="micro-nav">
+            <a href="#workspace">Workspace</a>
+            <a href="https://github.com/danielavokalova/nofluff">GitHub</a>
+          </nav>
         </div>
-        <div class="hero-card">
-          <p class="card-label">What it does best</p>
-          <ol>
-            <li>Paste a source URL</li>
-            <li>Fetch the page text</li>
-            <li>Generate EN / CZ summary</li>
-            <li>Copy or export for email</li>
-          </ol>
+
+        <div class="hero-grid">
+          <div class="hero-copy-wrap">
+            <p class="eyebrow">Client-ready extraction</p>
+            <h1>No Fluff. Just the Meat.</h1>
+            <p class="hero-copy">
+              Turn messy product pages, pasted notes, files, and screenshots into a concise client email or
+              a short internal summary that actually says something useful.
+            </p>
+
+            <div class="hero-actions">
+              <a class="button primary" href="#workspace">Open workspace</a>
+              <a class="button secondary" href="https://github.com/danielavokalova/nofluff">View repo</a>
+            </div>
+          </div>
+
+          <div class="hero-stage">
+            <div class="hero-orbit"></div>
+            <div class="hero-card hero-card-main">
+              <p class="card-label">Best for</p>
+              <ul>
+                <li>Long vendor pages</li>
+                <li>Pricing-heavy product sites</li>
+                <li>Visual landing pages</li>
+                <li>Client-facing recaps</li>
+              </ul>
+            </div>
+            <div class="hero-card hero-card-facts">
+              <span>URL</span>
+              <span>TEXT</span>
+              <span>FILES</span>
+              <span>SCREENSHOTS</span>
+            </div>
+          </div>
         </div>
       </header>
 
-      <main class="layout">
+      <section class="marquee-band">
+        <span>Client email</span>
+        <span>Short summary</span>
+        <span>English</span>
+        <span>Czech</span>
+        <span>URL fetch</span>
+        <span>OCR screenshots</span>
+      </section>
+
+      <main id="workspace" class="layout">
         <section class="panel">
           <div class="panel-heading">
             <h2>Source</h2>
